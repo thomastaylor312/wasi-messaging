@@ -1,10 +1,11 @@
-interface messaging-types {
+interface types {
     /// A connection to a message-exchange service (e.g., buffer, broker, etc.).
     resource client {
         connect: static func(name: string) -> result<client, error>;
     }
     
-    /// TODO(danbugs): This should be eventually extracted as an underlying type for other wasi-cloud-core interfaces.
+    // TODO(danbugs): This should be eventually extracted as an underlying type for other 
+    // wasi-cloud-core interfaces.
     resource error {
         trace: static func() -> string;    
     }
@@ -27,7 +28,12 @@ interface messaging-types {
     record message {
         /// The topic or subject this message was received or should be sent on
         topic: string,
-        /// An optional topic for use in request/response scenarios
+        /// An optional content-type describing the format of the data in the message. This is 
+        /// sometimes described as the "format" type
+        content-type: string,
+        /// An optional topic for use in request/response scenarios. Senders and consumers of
+        /// messages must not assume that this field is set and should handle it in their code
+        /// accordingly.
         reply-to: option<string>,
         /// An opaque blob of data
         data: list<u8>,

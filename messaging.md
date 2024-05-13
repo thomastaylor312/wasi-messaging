@@ -2,24 +2,25 @@
 <ul>
 <li>Imports:
 <ul>
-<li>interface <a href="#wasi:messaging_messaging_types_0.2.0_draft"><code>wasi:messaging/messaging-types@0.2.0-draft</code></a></li>
+<li>interface <a href="#wasi:messaging_types_0.2.0_draft"><code>wasi:messaging/types@0.2.0-draft</code></a></li>
 <li>interface <a href="#wasi:messaging_producer_0.2.0_draft"><code>wasi:messaging/producer@0.2.0-draft</code></a></li>
 <li>interface <a href="#wasi:messaging_consumer_0.2.0_draft"><code>wasi:messaging/consumer@0.2.0-draft</code></a></li>
 </ul>
 </li>
 <li>Exports:
 <ul>
-<li>interface <a href="#wasi:messaging_messaging_guest_0.2.0_draft"><code>wasi:messaging/messaging-guest@0.2.0-draft</code></a></li>
+<li>interface <a href="#wasi:messaging_guest_0.2.0_draft"><code>wasi:messaging/guest@0.2.0-draft</code></a></li>
 </ul>
 </li>
 </ul>
-<h2><a name="wasi:messaging_messaging_types_0.2.0_draft"></a>Import interface wasi:messaging/messaging-types@0.2.0-draft</h2>
+<h2><a name="wasi:messaging_types_0.2.0_draft"></a>Import interface wasi:messaging/types@0.2.0-draft</h2>
 <hr />
 <h3>Types</h3>
 <h4><a name="client"></a><code>resource client</code></h4>
 <p>A connection to a message-exchange service (e.g., buffer, broker, etc.).</p>
 <h4><a name="error"></a><code>resource error</code></h4>
-<p>TODO(danbugs): This should be eventually extracted as an underlying type for other wasi-cloud-core interfaces.</p>
+<p>TODO(danbugs): This should be eventually extracted as an underlying type for other
+wasi-cloud-core interfaces.</p>
 <h4><a name="channel"></a><code>type channel</code></h4>
 <p><code>string</code></p>
 <p>There are two types of channels:
@@ -34,28 +35,33 @@
 <li><a name="guest_configuration.channels"></a><code>channels</code>: list&lt;<a href="#channel"><a href="#channel"><code>channel</code></a></a>&gt;</li>
 <li><a name="guest_configuration.extensions"></a><code>extensions</code>: option&lt;list&lt;(<code>string</code>, <code>string</code>)&gt;&gt;</li>
 </ul>
-<h4><a name="format_spec"></a><code>enum format-spec</code></h4>
-<p>Format specification for messages</p>
-<ul>
-<li>more info: https://github.com/clemensv/spec/blob/registry-extensions/registry/spec.md#message-formats</li>
-<li>message metadata can further decorate w/ things like format version, and so on.</li>
-</ul>
-<h5>Enum Cases</h5>
-<ul>
-<li><a name="format_spec.cloudevents"></a><code>cloudevents</code></li>
-<li><a name="format_spec.http"></a><code>http</code></li>
-<li><a name="format_spec.amqp"></a><code>amqp</code></li>
-<li><a name="format_spec.mqtt"></a><code>mqtt</code></li>
-<li><a name="format_spec.kafka"></a><code>kafka</code></li>
-<li><a name="format_spec.raw"></a><code>raw</code></li>
-</ul>
 <h4><a name="message"></a><code>record message</code></h4>
-<p>A message with a binary payload, a format specification, and decorative metadata.</p>
+<p>A message with a binary payload and additional information</p>
 <h5>Record Fields</h5>
 <ul>
-<li><a name="message.data"></a><code>data</code>: list&lt;<code>u8</code>&gt;</li>
-<li><a name="message.format"></a><code>format</code>: <a href="#format_spec"><a href="#format_spec"><code>format-spec</code></a></a></li>
-<li><a name="message.metadata"></a><code>metadata</code>: option&lt;list&lt;(<code>string</code>, <code>string</code>)&gt;&gt;</li>
+<li>
+<p><a name="message.topic"></a><code>topic</code>: <code>string</code></p>
+<p>The topic or subject this message was received or should be sent on
+</li>
+<li>
+<p><a name="message.content_type"></a><code>content-type</code>: <code>string</code></p>
+<p>An optional content-type describing the format of the data in the message. This is
+sometimes described as the "format" type
+</li>
+<li>
+<p><a name="message.reply_to"></a><code>reply-to</code>: option&lt;<code>string</code>&gt;</p>
+<p>An optional topic for use in request/response scenarios. Senders and consumers of
+messages must not assume that this field is set and should handle it in their code
+accordingly.
+</li>
+<li>
+<p><a name="message.data"></a><code>data</code>: list&lt;<code>u8</code>&gt;</p>
+<p>An opaque blob of data
+</li>
+<li>
+<p><a name="message.metadata"></a><code>metadata</code>: option&lt;list&lt;(<code>string</code>, <code>string</code>)&gt;&gt;</p>
+<p>Optional metadata (also called headers or attributes in some systems) attached to the message
+</li>
 </ul>
 <hr />
 <h3>Functions</h3>
@@ -74,6 +80,7 @@
 <li><a name="static_error.trace.0"></a> <code>string</code></li>
 </ul>
 <h2><a name="wasi:messaging_producer_0.2.0_draft"></a>Import interface wasi:messaging/producer@0.2.0-draft</h2>
+<p>The producer interface is uesed to send messages to a channel/topic.</p>
 <hr />
 <h3>Types</h3>
 <h4><a name="client"></a><code>type client</code></h4>
@@ -91,6 +98,8 @@
 ----
 <h3>Functions</h3>
 <h4><a name="send"></a><code>send: func</code></h4>
+<p>Sends a message to the given channel/topic. This topic can be overridden if a message has a
+non-empty topic field</p>
 <h5>Params</h5>
 <ul>
 <li><a name="send.c"></a><code>c</code>: own&lt;<a href="#client"><a href="#client"><code>client</code></a></a>&gt;</li>
@@ -102,6 +111,8 @@
 <li><a name="send.0"></a> result&lt;_, own&lt;<a href="#error"><a href="#error"><code>error</code></a></a>&gt;&gt;</li>
 </ul>
 <h2><a name="wasi:messaging_consumer_0.2.0_draft"></a>Import interface wasi:messaging/consumer@0.2.0-draft</h2>
+<p>The consumer interface allows a guest to dynamically update its subscriptions and configuration
+as well as functionality for completing (acking) or abandoning (nacking) messages.</p>
 <hr />
 <h3>Types</h3>
 <h4><a name="client"></a><code>type client</code></h4>
@@ -121,29 +132,6 @@
 <p>
 ----
 <h3>Functions</h3>
-<h4><a name="subscribe_try_receive"></a><code>subscribe-try-receive: func</code></h4>
-<p>Blocking receive for t-milliseconds with ephemeral subscription – if no message is received, returns None</p>
-<h5>Params</h5>
-<ul>
-<li><a name="subscribe_try_receive.c"></a><code>c</code>: own&lt;<a href="#client"><a href="#client"><code>client</code></a></a>&gt;</li>
-<li><a name="subscribe_try_receive.ch"></a><code>ch</code>: <a href="#channel"><a href="#channel"><code>channel</code></a></a></li>
-<li><a name="subscribe_try_receive.t_milliseconds"></a><code>t-milliseconds</code>: <code>u32</code></li>
-</ul>
-<h5>Return values</h5>
-<ul>
-<li><a name="subscribe_try_receive.0"></a> result&lt;option&lt;list&lt;<a href="#message"><a href="#message"><code>message</code></a></a>&gt;&gt;, own&lt;<a href="#error"><a href="#error"><code>error</code></a></a>&gt;&gt;</li>
-</ul>
-<h4><a name="subscribe_receive"></a><code>subscribe-receive: func</code></h4>
-<p>Blocking receive until message with ephemeral subscription</p>
-<h5>Params</h5>
-<ul>
-<li><a name="subscribe_receive.c"></a><code>c</code>: own&lt;<a href="#client"><a href="#client"><code>client</code></a></a>&gt;</li>
-<li><a name="subscribe_receive.ch"></a><code>ch</code>: <a href="#channel"><a href="#channel"><code>channel</code></a></a></li>
-</ul>
-<h5>Return values</h5>
-<ul>
-<li><a name="subscribe_receive.0"></a> result&lt;list&lt;<a href="#message"><a href="#message"><code>message</code></a></a>&gt;, own&lt;<a href="#error"><a href="#error"><code>error</code></a></a>&gt;&gt;</li>
-</ul>
 <h4><a name="update_guest_configuration"></a><code>update-guest-configuration: func</code></h4>
 <p>'Fit-all' type function for updating a guest's configuration – this could be useful for:</p>
 <ul>
@@ -151,6 +139,12 @@
 <li>checkpointing,</li>
 <li>etc..</li>
 </ul>
+<p>Please note that implementations that provide <code>wasi:messaging</code> are responsible for ensuring
+that guests are not allowed to subscribe to channels that they are not configured to
+subscribe to (or have access to). Failure to do so can result in possible breakout or access
+to resources that are not intended to be accessible to the guest. This means implementations
+should validate that the configured topix are valid topics the guest should have access to or
+enforce it via the credentials used to connect to the service.</p>
 <h5>Params</h5>
 <ul>
 <li><a name="update_guest_configuration.gc"></a><code>gc</code>: <a href="#guest_configuration"><a href="#guest_configuration"><code>guest-configuration</code></a></a></li>
@@ -187,7 +181,7 @@
 <ul>
 <li><a name="abandon_message.0"></a> result&lt;_, own&lt;<a href="#error"><a href="#error"><code>error</code></a></a>&gt;&gt;</li>
 </ul>
-<h2><a name="wasi:messaging_messaging_guest_0.2.0_draft"></a>Export interface wasi:messaging/messaging-guest@0.2.0-draft</h2>
+<h2><a name="wasi:messaging_guest_0.2.0_draft"></a>Export interface wasi:messaging/guest@0.2.0-draft</h2>
 <hr />
 <h3>Types</h3>
 <h4><a name="message"></a><code>type message</code></h4>
@@ -201,15 +195,9 @@
 <p>
 ----
 <h3>Functions</h3>
-<h4><a name="configure"></a><code>configure: func</code></h4>
-<p>Returns the list of channels (and extension metadata within guest-configuration) that
-this component should subscribe to and be handled by the subsequent handler within guest-configuration</p>
-<h5>Return values</h5>
-<ul>
-<li><a name="configure.0"></a> result&lt;<a href="#guest_configuration"><a href="#guest_configuration"><code>guest-configuration</code></a></a>, own&lt;<a href="#error"><a href="#error"><code>error</code></a></a>&gt;&gt;</li>
-</ul>
 <h4><a name="handler"></a><code>handler: func</code></h4>
-<p>Whenever this guest receives a message in one of the subscribed channels, the message is sent to this handler</p>
+<p>Whenever this guest receives a message in one of the subscribed channels, the message is
+sent to this handler</p>
 <h5>Params</h5>
 <ul>
 <li><a name="handler.ms"></a><code>ms</code>: list&lt;<a href="#message"><a href="#message"><code>message</code></a></a>&gt;</li>
