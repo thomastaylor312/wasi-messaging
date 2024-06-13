@@ -18,25 +18,22 @@ interface types {
         other(string),
     }
   
-    /// There are two types of channels:
-    /// - publish-subscribe channel, which is a broadcast channel, and
-    /// - point-to-point channel, which is a unicast channel.
-    ///
-    /// The interface doesn't highlight this difference in the type itself as that's uniquely a consumer issue.
-    type channel = string;
+    /// The topic of a message. This is also called subject, channel, or group in various messaging
+    /// systems. What this value means is up to the implementation.
+    type topic = string;
   
-    /// Configuration includes a required list of channels the guest is subscribing to
+    /// Configuration includes a required list of topics the guest is subscribing to
     record config {
-        channels: list<channel>,
+        topics: list<topic>,
     }
   
     /// A message with a binary payload and additional information
     resource message {
-        constructor(topic: channel, data: list<u8>, content-type: option<string>, metadata: option<list<tuple<string, string>>>);
+        constructor(topic: topic, data: list<u8>, content-type: option<string>, metadata: option<list<tuple<string, string>>>);
         /// The topic/subject/channel this message was received or should be sent on
-        topic: func() -> channel;
+        topic: func() -> topic;
         /// Set the topic/subject/channel this message should be sent on
-        set-topic: func(topic: channel);
+        set-topic: func(topic: topic);
         /// An optional content-type describing the format of the data in the message. This is 
         /// sometimes described as the "format" type
         content-type: func() -> option<string>;

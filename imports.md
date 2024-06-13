@@ -36,17 +36,15 @@ action. This error is mainly used when calling `update-config`.
 <p>A catch all for other types of errors
 </li>
 </ul>
-<h4><a name="channel"></a><code>type channel</code></h4>
+<h4><a name="topic"></a><code>type topic</code></h4>
 <p><code>string</code></p>
-<p>There are two types of channels:
-- publish-subscribe channel, which is a broadcast channel, and
-- point-to-point channel, which is a unicast channel.
-<p>The interface doesn't highlight this difference in the type itself as that's uniquely a consumer issue.</p>
+<p>The topic of a message. This is also called subject, channel, or group in various messaging
+systems. What this value means is up to the implementation.
 <h4><a name="config"></a><code>record config</code></h4>
 <p>Configuration includes a required list of channels the guest is subscribing to</p>
 <h5>Record Fields</h5>
 <ul>
-<li><a name="config.channels"></a><code>channels</code>: list&lt;<a href="#channel"><a href="#channel"><code>channel</code></a></a>&gt;</li>
+<li><a name="config.channels"></a><code>channels</code>: list&lt;<a href="#topic"><a href="#topic"><code>topic</code></a></a>&gt;</li>
 </ul>
 <h4><a name="message"></a><code>resource message</code></h4>
 <h2>A message with a binary payload and additional information</h2>
@@ -63,7 +61,7 @@ action. This error is mainly used when calling `update-config`.
 <h4><a name="constructor_message"></a><code>[constructor]message: func</code></h4>
 <h5>Params</h5>
 <ul>
-<li><a name="constructor_message.topic"></a><code>topic</code>: <a href="#channel"><a href="#channel"><code>channel</code></a></a></li>
+<li><a name="constructor_message.topic"></a><a href="#topic"><code>topic</code></a>: <a href="#topic"><a href="#topic"><code>topic</code></a></a></li>
 <li><a name="constructor_message.data"></a><code>data</code>: list&lt;<code>u8</code>&gt;</li>
 <li><a name="constructor_message.content_type"></a><code>content-type</code>: option&lt;<code>string</code>&gt;</li>
 <li><a name="constructor_message.metadata"></a><code>metadata</code>: option&lt;list&lt;(<code>string</code>, <code>string</code>)&gt;&gt;</li>
@@ -80,14 +78,14 @@ action. This error is mainly used when calling `update-config`.
 </ul>
 <h5>Return values</h5>
 <ul>
-<li><a name="method_message.topic.0"></a> <a href="#channel"><a href="#channel"><code>channel</code></a></a></li>
+<li><a name="method_message.topic.0"></a> <a href="#topic"><a href="#topic"><code>topic</code></a></a></li>
 </ul>
 <h4><a name="method_message.set_topic"></a><code>[method]message.set-topic: func</code></h4>
 <p>Set the topic/subject/channel this message should be sent on</p>
 <h5>Params</h5>
 <ul>
 <li><a name="method_message.set_topic.self"></a><code>self</code>: borrow&lt;<a href="#message"><a href="#message"><code>message</code></a></a>&gt;</li>
-<li><a name="method_message.set_topic.topic"></a><code>topic</code>: <a href="#channel"><a href="#channel"><code>channel</code></a></a></li>
+<li><a name="method_message.set_topic.topic"></a><a href="#topic"><code>topic</code></a>: <a href="#topic"><a href="#topic"><code>topic</code></a></a></li>
 </ul>
 <h4><a name="method_message.content_type"></a><code>[method]message.content-type: func</code></h4>
 <p>An optional content-type describing the format of the data in the message. This is
@@ -191,9 +189,6 @@ message</p>
 <h4><a name="client"></a><code>type client</code></h4>
 <p><a href="#client"><a href="#client"><code>client</code></a></a></p>
 <p>
-#### <a name="channel"></a>`type channel`
-[`channel`](#channel)
-<p>
 #### <a name="message"></a>`type message`
 [`message`](#message)
 <p>
@@ -203,12 +198,10 @@ message</p>
 ----
 <h3>Functions</h3>
 <h4><a name="send"></a><code>send: func</code></h4>
-<p>Sends a message to the given channel/topic. If the channel/topic is not empty, it will
-override the channel/topic in the message.</p>
+<p>Sends the message using the given client.</p>
 <h5>Params</h5>
 <ul>
 <li><a name="send.c"></a><code>c</code>: own&lt;<a href="#client"><a href="#client"><code>client</code></a></a>&gt;</li>
-<li><a name="send.ch"></a><code>ch</code>: <a href="#channel"><a href="#channel"><code>channel</code></a></a></li>
 <li><a name="send.m"></a><code>m</code>: own&lt;<a href="#message"><a href="#message"><code>message</code></a></a>&gt;</li>
 </ul>
 <h5>Return values</h5>

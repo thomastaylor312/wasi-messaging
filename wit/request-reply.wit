@@ -5,9 +5,20 @@
 interface request-reply {
     use types.{client, message, error};
 
-    /// Performs a blocking request/reply operation with an optional timeout. If the timeout value
-    /// is not set, then the request/reply operation will block indefinitely.
-    request: func(c: client, msg: message, timeout-ms: option<u32>) -> result<option<list<message>>, error>;
+    /// Options for a request/reply operation
+    record request-options {
+        /// The maximum amount of time to wait for a response. If the timeout value is not set, then
+        /// the request/reply operation will block until a message is received in response.
+        timeout-ms: option<u32>,
+        /// The number of expected replies. If the number of replies is not set, then the
+        /// request/reply operation will block until a single message is received in response (or a
+        /// timeout value is reached). This can be used in conjunction for "scatter/gather" type
+        /// operations.
+        expected-replies: option<u32>,
+    }
+
+    /// Performs a blocking request/reply operation with an optional set of request options
+    request: func(c: client, msg: message, opts: option<request-options>) -> result<option<list<message>>, error>;
 
     /// Replies to the given message with the given response message. The details of which channel 
     /// the message is sent to is up to the implementation. This allows for reply to details to be
